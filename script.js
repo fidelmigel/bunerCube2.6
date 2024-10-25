@@ -103,14 +103,19 @@ function addButtonsToFace() {
     videoElement.muted = true; // Звук вимкнено за замовчуванням
   }
 
+  // Додаємо обробник кліку для кнопки звуку.
   soundButton.addEventListener("click", function (event) {
     event.preventDefault(); // Запобігаємо переходу за посиланням.
-    // Прибираємо event.stopPropagation();
+    event.stopPropagation(); // Зупиняємо подію від "пробігу" вгору по дереву DOM.
+
     if (videoElement) {
-      videoElement.muted = !videoElement.muted; // Тогл звуку
-      soundButton.src = videoElement.muted
-        ? "images/no-sound.png"
-        : "images/volume-up.png"; // Змінюємо іконку
+      if (videoElement.muted) {
+        videoElement.muted = false; // Увімкнути звук
+        soundButton.src = "images/volume-up.png"; // Змінюємо іконку на "звук увімкнено"
+      } else {
+        videoElement.muted = true; // Вимкнути звук
+        soundButton.src = "images/no-sound.png"; // Змінюємо іконку на "звук вимкнено"
+      }
     }
   });
 }
@@ -142,6 +147,29 @@ function replaceCSS() {
   cube.style.height = "300px";
   cube.style.position = "relative"; // Відносна позиція для гранів куба.
   cube.style.transformStyle = "preserve-3d"; // Дозволяємо 3D-трансформації.
+
+  let isTouchingCube = false; // Перевірка, чи зараз є дотик на кубі
+
+  // Відстежуємо, коли палець торкається куба
+  cube.addEventListener("touchstart", function (e) {
+    isTouchingCube = true; // Дотик розпочався
+    stopAutoRotate(); // Зупиняємо автоматичне обертання
+  });
+
+  // Відстежуємо рух пальця всередині куба
+  cube.addEventListener("touchmove", function (e) {
+    if (isTouchingCube) {
+      const touch = e.touches[0]; // Отримуємо перший дотик
+      y += (touch.clientX - window.innerWidth / 2) * touchSensitivity; // Оновлюємо обертання куба залежно від руху пальця
+      updateCubeRotation(); // Оновлюємо обертання куба
+    }
+  });
+
+  // Відстежуємо, коли палець відпущено
+  cube.addEventListener("touchend", function () {
+    isTouchingCube = false; // Дотик завершено
+    resetAutoRotate(); // Запускаємо таймер для автоматичного відновлення обертання
+  });
 
   const sides = document.querySelectorAll(".side");
   sides.forEach((side) => {
