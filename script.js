@@ -103,19 +103,14 @@ function addButtonsToFace() {
     videoElement.muted = true; // Звук вимкнено за замовчуванням
   }
 
-  // Додаємо обробник кліку для кнопки звуку.
   soundButton.addEventListener("click", function (event) {
     event.preventDefault(); // Запобігаємо переходу за посиланням.
-    event.stopPropagation(); // Зупиняємо подію від "пробігу" вгору по дереву DOM.
-
+    // Прибираємо event.stopPropagation();
     if (videoElement) {
-      if (videoElement.muted) {
-        videoElement.muted = false; // Увімкнути звук
-        soundButton.src = "images/volume-up.png"; // Змінюємо іконку на "звук увімкнено"
-      } else {
-        videoElement.muted = true; // Вимкнути звук
-        soundButton.src = "images/no-sound.png"; // Змінюємо іконку на "звук вимкнено"
-      }
+      videoElement.muted = !videoElement.muted; // Тогл звуку
+      soundButton.src = videoElement.muted
+        ? "images/no-sound.png"
+        : "images/volume-up.png"; // Змінюємо іконку
     }
   });
 }
